@@ -28,11 +28,10 @@ let make_uri request_uri uri =
   |> set_scheme
 
 let rec http_get_and_follow ~max_redirects uri =
-  let open Lwt in
+  let open Lwt.Infix in
   Cohttp_lwt_unix.Client.get uri >>= follow_redirect ~max_redirects uri
 
 and follow_redirect ~max_redirects request_uri (response, body) =
-  let open Lwt in
   match Cohttp.Response.status response with
   | `OK -> Lwt.return (response, body)
   | `Resume_incomplete (* actually 308 Permanent Redirect *)

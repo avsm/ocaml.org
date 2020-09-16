@@ -73,7 +73,6 @@ let cwn_html_page () =
 let cwn_html_summary() =
   match (Lazy.force post).Rss2.story with
   | Rss2.All(_, _, content) ->
-     let open Nethtml in
      Nethtml.parse (new Netchannels.input_string content)
        ~dtd:Utils.relaxed_html40_dtd
   | Rss2.Title _ | Rss2.Description _ -> failwith "cwn_page"

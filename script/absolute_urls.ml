@@ -1,6 +1,4 @@
 (* Convert relative links to absolute ones *)
-open Printf
-
 let make_absolute base orig_url =
   let orig_url = String.trim orig_url in (* bypass bug in omd *)
   Uri.(to_string (resolve "http" base (of_string orig_url)))

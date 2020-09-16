@@ -18,7 +18,6 @@ let governing_keywords = [
 
 let to_html t =
   let open Printf in
-  let open Buffer in
   let b = Buffer.create 42 in
   begin
     match t.kind with

@@ -1,7 +1,6 @@
 (* Small utility to extract the language of the filename. *)
 
 open Printf
-open Utils
 
 let language_of_ISO639 = function
   | "en" -> "English"

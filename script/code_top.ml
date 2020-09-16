@@ -89,7 +89,7 @@ let eval phrase =
 
 
 (* Input lines until a ";;" appears on its own line *)
-let rec input_phrase ch =
+let input_phrase ch =
   let buf = Buffer.create 128 in
   let continue = ref true in
   while !continue do

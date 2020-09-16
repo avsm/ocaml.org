@@ -5,7 +5,7 @@ open Utils
 
 let title_re = Str.regexp "((! *set *title *\\([^ ][^!]*\\)!))"
 
-let get_title lang path =
+let get_title _lang path =
   let s = string_of_file path in
   try
     ignore(Str.search_forward title_re s 0); (* or Not_found *)
@@ -36,7 +36,7 @@ let rec breadcrumb_of_path bc lang path =
     breadcrumb_of_path (entry :: bc) lang (Filename.dirname path)
   )
 
-let rec to_html bc =
+let to_html bc =
   let b = Buffer.create 1024 in
   let rec add_component = function
     | [] -> assert false

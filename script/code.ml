@@ -1,9 +1,7 @@
 (* Syntax highlight code and eval ocaml toplevel phrases *)
 
 open Printf
-open Scanf
 open Code_types
-open Utils
 
 (* To HTML, with syntax highlighting
  ***********************************************************************)
@@ -165,14 +163,14 @@ let get_toplevel (top: toplevel) =
   match !top with
   | Run t -> t
   | Sleep pgm ->
-     let (from_top, _) as t = Unix.open_process pgm in
+     let (_from_top, _) as t = Unix.open_process pgm in
      top := Run t;
      t
 
 let close_toplevel (top: toplevel) =
   match !top with
   | Sleep _ -> ()
-  | Run((from_top, to_top) as top) ->
+  | Run top ->
      (match Unix.close_process top with
       | Unix.WEXITED i -> if i <> 0 then eprintf "WEXITED %i\n%!" i
       | Unix.WSIGNALED i -> eprintf "WSIGNALED %i\n%!" i
@@ -323,7 +321,7 @@ let highlight_error phrase err_msg =
     and c2 = int_of_string(Str.matched_group 3 err_msg) in
     (* Convert the line [1 .. l-1] into character count. *)
     let c = ref 0 in
-    for line = 1 to l - 1 do c := String.index_from phrase !c '\n' + 1 done;
+    for _ = 1 to l - 1 do c := String.index_from phrase !c '\n' + 1 done;
     let phrase = highlight_ocaml phrase in
     highlight_error_range phrase err_msg (c1 + !c) (c2 + !c)
   )

@@ -1,0 +1,83 @@
+(library
+  (name ocamlorg_utils)
+  (modules utils http)
+  (libraries threads netstring syndic cohttp-lwt-unix)
+  (wrapped false))
+
+(library
+  (name ocamlorg_code)
+  (modules code_types code)
+  (libraries ocamlorg_utils omd)
+  (wrapped false))
+
+(library
+  (name ocamlorg_urls)
+  (modules urlfun)
+  (libraries ocamlorg_utils)
+  (wrapped false))
+
+(executable 
+  (name generate_opam_update_list)
+  (modules generate_opam_update_list)
+  (libraries cow))
+
+(executable
+  (name lang_of_filename)
+  (modules lang_of_filename)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name translate)
+  (modules translate)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name link_of_lang)
+  (modules link_of_lang)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name breadcrumb)
+  (modules breadcrumb)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name rss2html)
+  (modules rss2html)
+  (libraries ocamlorg_utils syndic))
+
+(executable
+  (name weekly_news)
+  (modules weekly_news)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name ocamltohtml)
+  (modules lexer ocamltohtml)
+  (libraries ocamlorg_utils))
+
+(executable
+  (name md_preprocess)
+  (modules md_preprocess)
+  (libraries ocamlorg_utils ocamlorg_code))
+
+(executable
+  (name code_top)
+  (modules code_top)
+  (modes byte)
+  (libraries ocamlorg_code compiler-libs.toplevel))
+
+(executable
+  (name relative_urls)
+  (modules relative_urls)
+  (libraries ocamlorg_urls))
+
+(executable
+  (name absolute_urls)
+  (modules absolute_urls)
+  (libraries ocamlorg_urls))
+
+(executable
+  (name translations)
+  (modules translations)
+  (libraries ocamlorg_utils))

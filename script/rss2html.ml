@@ -42,14 +42,14 @@ and resolve_links_el ~xmlbase = function
      let attrs = match List.partition (fun (t,_) -> t = "href") attrs with
        | [], _ -> attrs
        | (_, h) :: _, attrs ->
-          let src = Uri.to_string(XML.resolve xmlbase (Uri.of_string h)) in
+          let src = Uri.to_string(XML.resolve ~xmlbase (Uri.of_string h)) in
           ("href", src) :: attrs in
      Nethtml.Element("a", attrs, resolve ?xmlbase sub)
   | Nethtml.Element("img", attrs, sub) ->
      let attrs = match List.partition (fun (t,_) -> t = "src") attrs with
        | [], _ -> attrs
        | (_, src) :: _, attrs ->
-          let src = Uri.to_string(XML.resolve xmlbase (Uri.of_string src)) in
+          let src = Uri.to_string(XML.resolve ~xmlbase (Uri.of_string src)) in
           ("src", src) :: attrs in
      Nethtml.Element("img", attrs, sub)
   | Nethtml.Element(e, attrs, sub) ->
@@ -83,7 +83,7 @@ let html_of_text ?xmlbase s =
 
 (* Do not trust sites using XML for HTML content.  Convert to string
    and parse back.  (Does not always fix bad HTML unfortunately.) *)
-let rec html_of_syndic =
+let html_of_syndic =
   let ns_prefix _ = Some "" in
   fun ?xmlbase h ->
   html_of_text ?xmlbase
@@ -284,8 +284,8 @@ and len_prefix_of_el el len =
      let len, prefix_content = len_prefix_of_html content len in
      len, Element(tag, args, prefix_content)
 
-let rec prefix_of_html html len =
-  snd(len_prefix_of_html html len)
+let prefix_of_html html len =
+  snd (len_prefix_of_html html len)
 
 
 let new_id =
