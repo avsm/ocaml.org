@@ -81,3 +81,13 @@
   (name translations)
   (modules translations)
   (libraries ocamlorg_utils))
+
+;; TODO rearrange this to an incoming directory
+(rule
+  (targets last10_updates.json)
+  (action (run curl -O http://opam.ocaml.org/json/last10_updates.json)))
+
+(rule
+  (targets opam_update_list)
+  (deps last10_updates.json)
+  (action (run ./generate_opam_update_list.exe)))
