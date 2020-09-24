@@ -9,7 +9,6 @@ configure
 *.cmxa
 *.annot
 .*.swp
-ocaml.org/
 ocamltohtml
 rss2html
 relative_urls

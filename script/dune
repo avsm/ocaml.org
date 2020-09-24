@@ -27,6 +27,11 @@
   (libraries ocamlorg_utils))
 
 (executable
+  (name gen_dune_files)
+  (libraries bos rresult)
+  (modules gen_dune_files))
+
+(executable
   (name translate)
   (modules translate)
   (libraries ocamlorg_utils))
