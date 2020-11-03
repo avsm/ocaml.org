@@ -1,8 +1,8 @@
 <!DOCTYPE HTML>
 {{!s set contents {{!i input ((! get page !)) i!}} s!}}
 <html xmlns="http://www.w3.org/1999/xhtml"
-      lang="{{! cmd script/lang_of_filename ((! get filename !)) !}}"
-      xml:lang="{{! cmd script/lang_of_filename ((! get filename !)) !}}" >
+      lang="{{! get language !)) !}}"
+      xml:lang="{{! get language  !))" >
   <head>
     <meta charset="utf-8" />
     {{!n ifndef notranslations

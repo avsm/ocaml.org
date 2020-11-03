@@ -2,50 +2,56 @@
    by iterating through the `site/` directory and generating
    appropriate dune files depending on the extension.
 
-   This script will be promoted into the ocaml.org/dune files.
+   This script will be promoted into the ocaml.org/dune files,
+   so it is run from within the _build/<context> directory.
 *)
 
 open Bos
 open Rresult
 
-let dune_rules = Hashtbl.create 23
-let add_rule p rule =
-  let p = Fpath.(parent p / "dune.inc") in
-  match Hashtbl.find dune_rules p with
-  | rules -> Hashtbl.replace dune_rules p (rule :: rules)
-  | exception Not_found -> Hashtbl.add dune_rules p [rule]
+let toc = "*Table of contents*"
 
-let src_dir = Fpath.v "site"
-let dst_dir = Fpath.v "ocaml.org"
+let latest_ocaml_version = "4.11.1" (* TODO *)
+let latest_ocaml_version_main = "4.11" (* TODO *)
+(* TODO move this to a config file *)
+let mpp_options =
+  Printf.sprintf {|-so "((!" -sc "!))" -son "{{!" -scn "!}}" -soc "" -scc "" -sec "" -sos "{{<" -scs ">}}" -its -set "LATEST_OCAML_VERSION=%s" -set "LATEST_OCAML_VERSION_MAIN=%s" |} latest_ocaml_version latest_ocaml_version_main
 
-let target p ext =
-  match Fpath.relativize ~root:src_dir p with
-  | None -> failwith "target: internal error"
-  | Some r -> Fpath.(dst_dir // (set_ext ext r))
+let has_toc file =
+  OS.File.read_lines file >>|
+  List.exists ((=) toc)
 
-let process_md p =
-  (* TODO check for TOC *)
-  let dst = target p ".html" in
-  Format.printf "md %a\n%!" Fpath.pp p;
-  let rule = Format.sprintf
-{| (rule (target %s) (deps ../) (action (copy %%{deps} %%{target}))) |} (Fpath.basename dst) in
-  add_rule p rule
-   
+let addsegs src =
+  let s = Fpath.segs src |> List.map (fun _ -> "../") |> String.concat "" |> Fpath.v in
+  Fpath.(s / "site" // src)
 
-let process_file p () =
-  (* Format.printf "processing %a\n%!" Fpath.pp p; *)
-  match Fpath.get_ext p with
-  | ".md" -> process_md p
-  | _ -> ()
+let makedep src fullsrc =
+   Fpath.(v ".." // addsegs src / basename fullsrc)
+
+let process_md src ~fullsrc =
+  let srcdep = Fpath.to_string (makedep src fullsrc) in
+  let _has_toc = OS.File.read_lines fullsrc >>| List.exists ((=) toc) |> R.get_ok in
+  let target = Fpath.(set_ext ".html" fullsrc |> basename) in
+  let action = Printf.sprintf
+    "(run %%{bin:mpp} %s -set filename=%%{dep:%s.tmp} -set page=%%{target} %%{project_root}/template/main.mpp -o %%{target})" mpp_options target in
+  Format.printf "(rule (target %s)\n  (deps %%{project_root}/template/main.mpp)\n  (action %s))\n%!" target action;
+  Format.printf "(rule (target %s.tmp)\n (action (with-stdout-to %%{target} (with-stdin-from %s (run %%{bin:ocamlorg-md-pp})))))\n" target srcdep;
+  Format.printf "\n"
  
+let process_default src ~fullsrc =
+  Format.printf "(copy_files %a)\n" Fpath.pp (makedep src fullsrc)
 
-let iter_site () =
-  let root = Fpath.v "site" in
-  OS.Path.fold ~elements:`Files process_file () [root]
+let process_file srcdir fullsrc =
+  (* Format.printf "processing %a\n%!" Fpath.pp p; *)
+  match Fpath.get_ext fullsrc with
+  | ".md" -> process_md srcdir ~fullsrc
+  | _ -> process_default srcdir ~fullsrc
 
+let handle = function Ok v -> v | Error (`Msg m) -> failwith m
+
+(* Sys.argv.(1) is the relative path from site/ *)
 let () =
-  iter_site () |> R.get_ok;
-  Hashtbl.iter (fun p rules ->
-    let r = List.rev rules |> String.concat "\n" in
-    Format.printf "%a:\n%s\n\n%!" Fpath.pp p r
-  ) dune_rules
+  let src = Fpath.v Sys.argv.(1) in
+  let dir = Fpath.(v "../../.." // (addsegs src)) in
+  let is_file r = OS.File.exists r |> R.get_ok in
+  OS.Dir.contents dir |> handle |> List.filter is_file |> List.iter (process_file src)

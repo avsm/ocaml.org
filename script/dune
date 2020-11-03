@@ -28,8 +28,14 @@
 
 (executable
   (name gen_dune_files)
+  (public_name ocamlorg-gen-dune-files)
   (libraries bos rresult)
   (modules gen_dune_files))
+
+(executable
+  (name gen_dune_dirs)
+  (libraries bos rresult)
+  (modules gen_dune_dirs))
 
 (executable
   (name translate)
@@ -63,6 +69,7 @@
 
 (executable
   (name md_preprocess)
+  (public_name ocamlorg-md-pp)
   (modules md_preprocess)
   (libraries ocamlorg_utils ocamlorg_code))
 

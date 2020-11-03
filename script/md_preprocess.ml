@@ -95,7 +95,7 @@ let () =
   let any_change = ref false in
   let md = toggle_solutions any_change md [] in
   let md = if !any_change then toggle_js :: md else md in
-  print_string(Omd.to_markdown md)
+  print_string (Omd.to_html md)
 
 
 (* Local Variables: *)
